@@ -34,7 +34,7 @@ def get_home_url():
 
     return f"{urljoin(base_url,home_ep)}?{urlencode(params)}"
 
-def m1():
+def top_stories_url():
     url = get_home_url()
 
     options = Options()
@@ -61,9 +61,6 @@ def m1():
     top_stories_link = soup.find('a',class_ = 'aqvwYd')
     if top_stories_link:
         url_ts = top_stories_link['href']
-        return [urljoin(url,url_ts)]
+        return urljoin(url,url_ts)
     else:
         raise ClasschangeError
-
-if __name__ == '__main__':
-    m1()

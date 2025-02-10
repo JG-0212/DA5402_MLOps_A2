@@ -1,9 +1,6 @@
-import configparser
-from urllib.parse import urljoin,urlencode
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 import time
-import datetime
 
 class WebDriverInitializationError(Exception):
     """Exception raised when unable to initialize the WebDriver."""
@@ -18,7 +15,7 @@ class GoogleNewsRetrievalError(Exception):
     pass
 
 
-def main(url):
+def top_stories_scrape(url):
     options = Options()
     options.add_argument('--headless')
     try:
@@ -39,4 +36,4 @@ def main(url):
     if ps is None:
         raise GoogleNewsRetrievalError 
     else:
-        return [url,ps]
+        return ps
