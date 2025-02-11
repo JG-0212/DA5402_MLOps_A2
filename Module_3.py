@@ -1,17 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import configparser
-from urllib.parse import urljoin,urlencode,urlparse
-from selenium import webdriver
-from selenium.webdriver.edge.options import Options
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
-import time
-from datetime import datetime
-import pytz
-import os
-import psycopg2
-from config import config
+from urllib.parse import urlparse
 import base64
 import requests
 
@@ -26,8 +15,13 @@ def is_relative_url(url):
     parsed_url = urlparse(url)
     return not parsed_url.scheme 
 
+def pull_ts_scrape(**kwargs):
+    ti = kwargs['ti']
+    pulled_value_1 = ti.xcom_pull(key='return_value', task_ids='top_stories_scrape')
+    return pulled_value_1
 
-def extract_data(url,ps):
+def extract_data(**kwargs):
+    url,ps = pull_ts_scrape(**kwargs)
     soup = BeautifulSoup(ps, "html.parser")
     images = soup.find_all('img')
     

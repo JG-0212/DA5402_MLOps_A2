@@ -1,14 +1,6 @@
-import requests
-from bs4 import BeautifulSoup
-import configparser
-from urllib.parse import urljoin,urlencode,urlparse
-from selenium import webdriver
-from selenium.webdriver.edge.options import Options
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
+import os
 from datetime import datetime
 import os
-from config import config
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 class WebDriverInitializationError(Exception):
@@ -60,6 +52,7 @@ def insert_data(thumbnails,headlines,**kwargs):
     current_timestamp = datetime.now().isoformat()
     article_date = current_timestamp.date().isoformat()
 
+    id = 0
     for t,h in zip(thumbnails,headlines):
         insert_2((h,current_timestamp,article_date),**kwargs)
         ti = kwargs['ti']
@@ -67,6 +60,14 @@ def insert_data(thumbnails,headlines,**kwargs):
             continue
         insert_1(t)
         id += 1
+    
+    parent = os.abspath(os.path.join(os.getcwd(),os.pardir))
+    run_dir = os.path.join(parent, "run")
+    os.makedirs(run_dir, exist_ok=True)
+    file_path = os.path.join(run_dir,"status.txt")
+    with open(file_path, "w") as f:
+        f.write(id)
+    
 
 
 

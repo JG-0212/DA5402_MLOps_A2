@@ -1,21 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from Module_1 import top_stories_url
 from Module_2 import top_stories_scrape
 from Module_3 import extract_data
 from airflow import DAG
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
-
-def pull_ts_url(**kwargs):
-    ti = kwargs['ti']
-    pulled_value_1 = ti.xcom_pull(key='top_stories_url', task_ids='base_scrape')
-    return pulled_value_1
-
-def pull_ts_scrape(**kwargs):
-    ti = kwargs['ti']
-    pulled_value_1 = ti.xcom_pull(key='top_stories_scrape', task_ids='top_stories_scrape')
-    return pulled_value_1
-
 from airflow.operators.python import PythonOperator
+
+
+
+
 
 with DAG(
     "ImageScraper",
@@ -44,11 +37,12 @@ with DAG(
         task_id = "top_stories_scrape",
         python_callable = top_stories_scrape,
         op_args = [pull_ts_url],
+        provide_context = True,
     )
     
     t3 = PythonOperator(
         task_id = "extract_thumbnails_headlines",
-        python_callable = top_stories_scrape,
+        python_callable = extract_data,
         op_args = [pull_ts_url,pull_ts_scrape],
     )
 

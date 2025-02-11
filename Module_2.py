@@ -14,8 +14,14 @@ class GoogleNewsRetrievalError(Exception):
     """Exception raised when unable to retrieve Google News content."""
     pass
 
+def pull_ts_url(**kwargs):
+    ti = kwargs['ti']
+    pulled_value_1 = ti.xcom_pull(key='return_value', task_ids='base_scrape')
+    return pulled_value_1
 
-def top_stories_scrape(url):
+def top_stories_scrape(**kwargs):
+
+    url = pull_ts_url(**kwargs)
     options = Options()
     options.add_argument('--headless')
     try:
