@@ -7,7 +7,10 @@ import requests
 def get_image_base64_from_url(image_url):
     response = requests.get(image_url)
     response.raise_for_status()
-    base64_encoded_image = base64.b64encode(response.content).decode('utf-8')
+    base64_encoded_image = base64.b64encode(response.content).decode('UTF-8')
+    print(image_url)
+    print(base64_encoded_image)
+    print(len(base64_encoded_image))
     return base64_encoded_image
 
 
@@ -17,7 +20,7 @@ def is_relative_url(url):
 
 def pull_ts_scrape(**kwargs):
     ti = kwargs['ti']
-    pulled_value_1 = ti.xcom_pull(key='return_value', task_ids='top_stories_scrape')
+    pulled_value_1 = ti.xcom_pull(key='return_value', task_ids='ts_scrape')
     return pulled_value_1
 
 def extract_data(**kwargs):

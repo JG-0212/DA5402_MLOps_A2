@@ -1,17 +1,10 @@
 import configparser
 from urllib.parse import urljoin,urlencode
-from selenium import webdriver
-from selenium.webdriver.edge.options import Options
+import requests
 import time
 from bs4 import BeautifulSoup
-
-class WebDriverInitializationError(Exception):
-    """Exception raised when unable to initialize the WebDriver."""
-    pass
-
-class BrowserAccessError(Exception):
-    """Exception raised when unable to access the Browser."""
-    pass
+import importlib
+import os
 
 class GoogleNewsRetrievalError(Exception):
     """Exception raised when unable to retrieve Google News content."""
@@ -23,7 +16,12 @@ class ClasschangeError(Exception):
 
 def get_home_url():
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config.read('dags/assignment-02-JG-0212/a2_config.ini')
+
+    print("Succesfully read config file")
+    for section in config.sections():
+    	print(f"[{section}]")
+    print("No sections found")
     base_url = config['GoogleNews']['base_url']
     home_ep = config['GoogleNews']['home_endpoint']
     params = {
@@ -34,33 +32,23 @@ def get_home_url():
 
     return f"{urljoin(base_url,home_ep)}?{urlencode(params)}"
 
-def top_stories_url():
+def top_stories_scrape():
     url = get_home_url()
-
-    options = Options()
-    options.add_argument('--headless')
-    try:
-        browser = webdriver.Edge(options=options)  
-    except WebDriverInitializationError as e:
-        raise e
-
-    try:      
-        browser.get(url)
-    except BrowserAccessError as e:
-        raise e
-    
-    time.sleep(2)
-    browser.execute_script('window.scrollTo(0,document.body.scrollHeight);')
-    ps = browser.page_source
+    ps = requests.get(url)
     if ps is None:
+        print("Error in retrieving home page")
         raise GoogleNewsRetrievalError 
-    
-    browser.quit()
-
-    soup = BeautifulSoup(ps, "html.parser")
+    print("Home page succesfully retrieved")
+    soup = BeautifulSoup(ps.text, "html.parser")
     top_stories_link = soup.find('a',class_ = 'aqvwYd')
     if top_stories_link:
         url_ts = top_stories_link['href']
-        return urljoin(url,url_ts)
+        abs_url_ts = urljoin(url,url_ts)
+        ts_ps = requests.get(abs_url_ts).text
+        print("Is abs_url_ts none")
+        print(abs_url_ts is None)
+        print("Is ts_ps None")
+        print(ts_ps is None)
+        return [abs_url_ts,ts_ps]
     else:
         raise ClasschangeError
