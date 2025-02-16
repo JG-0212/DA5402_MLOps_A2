@@ -5,7 +5,8 @@
    - AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
    - AIRFLOW__SMTP__SMTP_STARTTLS: True
    - AIRFLOW__SMTP__SMTP_SSL: False
-   - AIRFLOW__SMTP__SMTP_USER: 
-   - AIRFLOW__SMTP__SMTP_PASSWORD: 
+   - AIRFLOW__SMTP__SMTP_USER:  #your mail id
+   - AIRFLOW__SMTP__SMTP_PASSWORD: #your app password
    - AIRFLOW__SMTP__SMTP_PORT: 587
-   - AIRFLOW__SMTP__SMTP_MAIL_FROM: 
+   - AIRFLOW__SMTP__SMTP_MAIL_FROM: #your name and mail
+4. Please add a Postgres and File connection in the Docker UI
