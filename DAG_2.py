@@ -8,11 +8,13 @@ import importlib
 a6 = importlib.import_module('assignment-02-JG-0212.Module_6')
 from airflow.decorators import task
 
+#Function to pull the number of new entries in the table
 def pull_inserts(**kwargs):
     ti = kwargs['ti']
     pulled_value_1 = ti.xcom_pull(key='return_value', task_ids='updater')
     return pulled_value_1
 
+#Function to delete status.txt file
 def status_deleter():
     os.remove('dags/run/status.txt')
 
@@ -20,18 +22,18 @@ def status_deleter():
 with DAG(
     "Mailer",
     description="A DAG which sends a mail whenever new entries are made",
-    schedule = "*/10 * * * *",
+    schedule = "0 * * * *",
     start_date=datetime(2025, 2, 15),
     catchup=False,
     tags=["A2"],
 ) as dag:
-
+   #Sensor operator to detect the presence of status.txt
     f1 = FileSensor(
         task_id='file_sensor_task',
         fs_conn_id='fs_default',
         filepath='dags/run/status.txt',
-        poke_interval=60,
-        timeout = 400,
+        poke_interval=600,
+        timeout = 4000,
         mode = 'reschedule',
     )
 
@@ -40,7 +42,7 @@ with DAG(
         python_callable =a6.update_inserts,
         provide_context = True,
     )
-
+    #Branch function to decide whether to send mail or not
     @task.branch(task_id="branch_task")
     def branch_func(ti=None):
         xcom_value = ti.xcom_pull(task_ids="updater")
@@ -50,7 +52,8 @@ with DAG(
             return None
 
     f3 = EmailOperator( 
-        task_id='send_email', 
+        task_id='send_email',
+       #Change to your mail id in which you wish to recieve mail 
         to='me21b078@smail.iitm.ac.in', 
         subject='Alert: New rows added ',
         html_content = """<h3> New data alert </h3>

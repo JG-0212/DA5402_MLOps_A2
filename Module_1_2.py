@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import importlib
 import os
 
+#Defining a few exceptions useful for the program
 class GoogleNewsRetrievalError(Exception):
     """Exception raised when unable to retrieve Google News content."""
     pass
@@ -14,7 +15,8 @@ class ClasschangeError(Exception):
     """Exception raised when Top Stories class change."""
     pass
 
-def get_home_url():
+#Function to retriev home url and top stories HTML class from  configuration file
+def get_home_url_top_stories_class():
     config = configparser.ConfigParser()
     config.read('dags/assignment-02-JG-0212/a2_config.ini')
 
@@ -29,26 +31,25 @@ def get_home_url():
         'gl': config['GoogleNews']['country'],
         'ceid': config['GoogleNews']['client_id']
     }
+    ts_class = config['GoogleNews']['top_stories_class']
 
-    return f"{urljoin(base_url,home_ep)}?{urlencode(params)}"
+    return f"{urljoin(base_url,home_ep)}?{urlencode(params)}",ts_class
 
+#Function to scrape top stories page and return its URL and the Top Stories Page source
 def top_stories_scrape():
-    url = get_home_url()
+    url,ts_class = get_home_url_top_stories_class()
     ps = requests.get(url)
     if ps is None:
         print("Error in retrieving home page")
         raise GoogleNewsRetrievalError 
     print("Home page succesfully retrieved")
     soup = BeautifulSoup(ps.text, "html.parser")
-    top_stories_link = soup.find('a',class_ = 'aqvwYd')
+    top_stories_link = soup.find('a',class_ = ts_class)
     if top_stories_link:
+        print("Top stories page succesfully retrieved")
         url_ts = top_stories_link['href']
         abs_url_ts = urljoin(url,url_ts)
         ts_ps = requests.get(abs_url_ts).text
-        print("Is abs_url_ts none")
-        print(abs_url_ts is None)
-        print("Is ts_ps None")
-        print(ts_ps is None)
         return [abs_url_ts,ts_ps]
     else:
         raise ClasschangeError

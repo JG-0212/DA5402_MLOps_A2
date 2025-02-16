@@ -1,6 +1,6 @@
 from datetime import datetime
 import importlib
-a1 = importlib.import_module("assignment-02-JG-0212.Module_1")
+a12 = importlib.import_module("assignment-02-JG-0212.Module_1_2")
 a3 = importlib.import_module("assignment-02-JG-0212.Module_3")
 a4 = importlib.import_module("assignment-02-JG-0212.Module_4")
 
@@ -15,7 +15,7 @@ from airflow.operators.python import PythonOperator
 with DAG(
     "ImageScraper",
     description="A DAG which scrapes top stories from GNews and stores unique values and related data in a PostGreSQL database",
-    schedule="*/10 * * * *",
+    schedule="0 * * * *",
     start_date=datetime(2025, 2, 15),
     catchup=False,
     tags=["A2"],
@@ -23,7 +23,7 @@ with DAG(
 
     t1 = PythonOperator(
         task_id = "ts_scrape",
-        python_callable = a1.top_stories_scrape,
+        python_callable = a12.top_stories_scrape,
         provide_context = True,
     )
 
@@ -32,7 +32,7 @@ with DAG(
         python_callable = a3.extract_data,
         provide_context = True,
     )
-
+    #An SQL task to create two tables, with the second table having a composite primary key
     t3 = SQLExecuteQueryOperator(
         task_id="create_data_table",
         conn_id = 'a2_db',
@@ -52,9 +52,9 @@ with DAG(
      )
    
 
-    t5 = PythonOperator(
+    t4 = PythonOperator(
         task_id = "insert_entries",
         python_callable = a4.insert_data,
      )
 
-    t1>>t2>>t3>>t5
+    t1>>t2>>t3>>t4
