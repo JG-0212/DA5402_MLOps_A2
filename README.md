@@ -1,1 +1,11 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/uECeo1no)
+# Points to consider
+1. A DockerFile with requirements.txt is provided. Please use that to build images in case of library unavailability or version mismatch.
+2. In contrast to assignment-1, Selenium is discarded upon realization that the images in GNews are API attachments and can all be retrieved using page source from Requests.
+3. For the mail configuration, please add the following environment variables in docker compose
+   - AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+   - AIRFLOW__SMTP__SMTP_STARTTLS: True
+   - AIRFLOW__SMTP__SMTP_SSL: False
+   - AIRFLOW__SMTP__SMTP_USER: 
+   - AIRFLOW__SMTP__SMTP_PASSWORD: 
+   - AIRFLOW__SMTP__SMTP_PORT: 587
+   - AIRFLOW__SMTP__SMTP_MAIL_FROM: 
